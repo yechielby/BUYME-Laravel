@@ -12,6 +12,6 @@ class Task_User extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'task_id'
+        'task_id', 'user_id'
     ];
 }
