@@ -2,13 +2,15 @@
 
 namespace App;
 
+use App\Task;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use HasApiTokens, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -25,7 +27,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 'remember_token', 'created_at', 'updated_at',
     ];
 
     /**
@@ -42,6 +44,6 @@ class User extends Authenticatable
      */
     public function tasks() {
         //return $this->belongsToMany(RelatedModel, pivot_table_name, foreign_key_of_current_model_in_pivot_table, foreign_key_of_other_model_in_pivot_table);
-        return $this->belongsToMany( Trop::class, 'task__users', 'user_id', 'task_id' );
+        return $this->belongsToMany( Task::class, 'task__users', 'user_id', 'task_id' )->withTimestamps();
     }
 }

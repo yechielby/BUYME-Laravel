@@ -14,4 +14,13 @@ class Task_User extends Model
     protected $fillable = [
         'task_id', 'user_id'
     ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'created_at', 'updated_at',
+    ];
 }
