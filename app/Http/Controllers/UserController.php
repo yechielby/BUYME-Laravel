@@ -14,49 +14,52 @@ class UserController extends Controller
     public function registerUser(Request $request)
     {
         // --------------------- [ User Registration ] ---------------------------
-        $validator  =   Validator::make($request->all(),
+        $validator = Validator::make($request->all(),
             [
-                'name'              =>      'required',
-                'email'             =>      'required',
-                'password'          =>      'required'
+                'name'      =>  'required',
+                'email'     =>  'required',
+                'password'  =>  'required'
             ]
         );
         // if validation fails
         if($validator->fails()) {
-            return response()->json(["validation errors" => $validator->errors()]);
+            return response()->json(["validationErrors" => $validator->errors()]);
         }
-        $input              =       array(
-            'name'              =>        $request->name,
-            'email'             =>        $request->email,
-            'password'          =>        bcrypt($request->password)
+        $input =  array(
+            'name'          =>  $request->name,
+            'email'         =>  $request->email,
+            'password'      =>  bcrypt($request->password)
         );
-        $user               =           User::create($input);
-        return response()->json(["success" => true, "status" => "success", "user" => $user]);
+        try {
+            $user = User::create($input);
+            return response()->json(["success" => true, "status" => "success", "user" => $user]);
+        } catch (\Exception $e) {
+            return response()->json(["validationErrors" => $e->getMessage()]);
+        }
     }
     // --------------------------- [ User Login ] ------------------------------
     public function loginUser(Request $request) {
         $validator = Validator::make($request->all(),
             [
-                'email'            =>         'required',
-                'password'         =>         'required',
+                'email'     =>  'required',
+                'password'  =>  'required',
             ]
         );
         // check if validation fails
         if($validator->fails()) {
-            return response()->json(["validation errors" => $validator->errors()]);
+            return response()->json(["validationErrors" => $validator->errors()]);
         }
-        $email  =   $request->email;
-        $password = $request->password;
-        $user   =   DB::table("users")->where("email", "=", $email)->first();
+        $email      = $request->email;
+        $password   = $request->password;
+        $user       = DB::table("users")->where("email", "=", $email)->first();
         if(is_null($user)) {
             return response()->json(["success" => false, "message" => "Email doesn't exist"]);
         }
         if(Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
             $user = Auth::user();
-            $token                  =       $user->createToken('token')->accessToken;
-            $success['success']     =       true;
-            $success['message']     =       "Success! you are logged in successfully";
-            $success['token']       =       $token;
+            $success['success'] = true;
+            $success['message'] = "Success! you are logged in successfully";
+            $success['token']   = $user->createToken('token')->accessToken;
             return response()->json(['success' => $success ], $this->success_status);
         }
         else {
@@ -65,37 +68,37 @@ class UserController extends Controller
     }
     // ---------------------------- [ Use Detail ] -------------------------------
     public function userDetail() {
-        $user       =       Auth::user();
+        $user = Auth::user();
         return response()->json(['success' => $user], $this->success_status);
     }
 
     // -------------------------- [ Edit Using Passport Auth ]--------------------
     public function update(Request $request) {
-        $user           =             Auth::user();
-        $validator      =            Validator::make($request->all(),
+        $user = Auth::user();
+        $validator = Validator::make($request->all(),
             [
-                'name'             =>         'required',
-                'email'            =>         'required',
-                'password'         =>         'required',
+                'name'      =>  'required',
+                'email'     =>  'required',
+                'password'  =>  'required',
             ]
         );
         // if validation fails
         if($validator->fails()) {
-            return response()->json(["validation errors" => $validator->errors()]);
+            return response()->json(["validationErrors" => $validator->errors()]);
         }
-        $userDataArray      =     array(
-            'name'              =>          $request->name,
-            'email'             =>          $request->email,
-            'password'          =>          bcrypt($request->password)
+        $userDataArray = array(
+            'name'      =>  $request->name,
+            'email'     =>  $request->email,
+            'password'  =>  bcrypt($request->password)
         );
-        $user           =       User::where('id', $user->id)->update($userDataArray);
+        $user = User::where('id', $user->id)->update($userDataArray);
         return response()->json(['success' => true, 'message' => 'User updated successfully']);
     }
 
 // ----------------------------- [ Delete User ] -----------------------------
     public function destroy() {
-        $user           =           Auth::user();
-        $user           =           User::findOrFail($user->id);
+        $user = Auth::user();
+        $user = User::findOrFail($user->id);
         $user->delete();
         return response()->json(['success' => true, 'message' => 'User deleted successfully']);
     }

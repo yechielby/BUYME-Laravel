@@ -21,16 +21,16 @@ class TaskController extends Controller
 
         $validator = Validator::make($request->all(),
             [
-                'title'         =>  'required'
+                'task.title'         =>  'required'
             ]
         );
 
         if($validator->fails()) {
-            return response()->json(["validation_errors" => $validator->errors()]);
+            return response()->json(["validationErrors" => $validator->errors()]);
         }
 
         $taskInput = array(
-            'title'         =>      $request->title,
+            'title'         =>      $request->task["title"],
             'isShared'      =>      false,
             'isCompleted'   =>      false
         );
@@ -60,10 +60,10 @@ class TaskController extends Controller
         // $tasks      = Task::whereIn('id', $tasksIds)->get();
         $tasks = $user->tasks()->get();
 
-        $success['status']  =   "success";
-        $success['data']    =   $tasks;
+        // $success['status']  =   "success";
+        // $success['data']    =   $tasks;
 
-        return response()->json(['success' => $success]);
+        return response()->json(['tasks' => $tasks]);
     }
 
 
@@ -107,7 +107,7 @@ public function shareTask(Request $request)
 
     // if validation fails
     if($validator->fails()) {
-        return response()->json(["validation errors" => $validator->errors()]);
+        return response()->json(["validationErrors" => $validator->errors()]);
     }
     $isSaved = 0;
 
@@ -143,26 +143,25 @@ public function shareTask(Request $request)
 
 // ------------------ [ Update Task ] ------------------
 
-    public function updateTask(Request $request)
+    public function updateTask(Request $request, $task_id)
     {
         $user = Auth::user();
 
         $validator = Validator::make($request->all(),
             [
-                'task_id'       =>      'required',
-                'title'         =>      'required',
-                'isCompleted'   =>      'required'
+                'task.title'         =>      'required',
+                'task.isCompleted'   =>      'required'
             ]
         );
 
         // if validation fails
         if($validator->fails()) {
-            return response()->json(["validation errors" => $validator->errors()]);
+            return response()->json(["validationErrors" => $validator->errors()]);
         }
 
         $inputData = array(
-            'title'             =>      $request->title,
-            'isCompleted'       =>      $request->boolean('isCompleted')
+            'title'             =>      $request->task["title"],
+            'isCompleted'       =>      boolval($request->task["isCompleted"])
         );
 
         // $task = Task::where('id', $request->task_id)->where('user_id', $user->id)->update($inputData);

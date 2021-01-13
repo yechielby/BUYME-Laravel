@@ -27,17 +27,17 @@ Route::group(['middleware' => 'cors'], function() {
 
         Route::delete('delete-user', 'UserController@destroy');
 
-        Route::post('create-task', 'TaskController@createTask');
+        Route::post('tasks', 'TaskController@createTask');
 
-        Route::get('task-listing', 'TaskController@taskListing');
+        Route::get('tasks', 'TaskController@taskListing');
 
         Route::get('task-detail/{task_id}', 'TaskController@taskDetail');
 
         Route::post('share-task', 'TaskController@shareTask');
 
-        Route::post('update-task', 'TaskController@updateTask');
+        Route::put('tasks/{task_id}', 'TaskController@updateTask');
 
-        Route::delete('delete-task/{task_id}', 'TaskController@deleteTask');
+        Route::delete('tasks/{task_id}', 'TaskController@deleteTask');
     });
 
 });
