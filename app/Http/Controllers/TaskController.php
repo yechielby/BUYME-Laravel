@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use App\Task;
 use App\Task_User;
 use Illuminate\Http\Request;
@@ -77,10 +78,13 @@ class TaskController extends Controller
         if(!is_null($task)) {
             $taskUserIds = $task->users()->pluck('user_id')->toArray();
             // $taskUserIds = Task::where('id', $task_id)->first()->users->pluck('id')->toArray();
-
+            $users = User::where('id', '<>', $user->id)->select('id','name')->get()->toArray();;
+            foreach ($users as $key => $user) {
+                $users[$key]['isShared']= in_array($user['id'], $taskUserIds);
+            }
             $success['status']  =   "success";
             $success['data']    =   $task;
-            $success['users']    =   $taskUserIds;
+            $success['users']   =   $users;
             return response()->json(['success' => $success]);
         }
 
